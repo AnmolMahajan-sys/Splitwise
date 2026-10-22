@@ -18,7 +18,7 @@ public class ExpenseGroup {
     @JoinColumn(name="created_by", nullable = false)
     private User createdBy;
 
-    @Column(name="created_at", nullable = false)
+    @Column(name="created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     protected  ExpenseGroup() {}
@@ -29,11 +29,12 @@ public class ExpenseGroup {
 
     @PrePersist
     void prePersist(){
-        if(createdBy == null){
+        if(createdAt == null){
             createdAt = Instant.now();
         }
     }
     public Long getId() {return id;}
     public String getName() {return name;}
     public User getCreatedBy() {return createdBy;}
+    public Instant getCreatedAt() {return createdAt;}
 }
