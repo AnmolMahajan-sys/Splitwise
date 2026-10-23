@@ -38,4 +38,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleInvalidExpense(InvalidExpenseException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", exception.getMessage()));
     }
+
+    @ExceptionHandler(InvalidSettlementException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidSettlement(InvalidSettlementException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", exception.getMessage()));
+    }
 }

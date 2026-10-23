@@ -52,7 +52,7 @@ public class Settlement {
         }
     }
 
-    public int getId() {return id;}
+    public long getId() {return id;}
     public ExpenseGroup getGroup() {return group;}
     public User getPaidBy() {return paidBy;}
     public User getPaidTo() {return paidTo;}

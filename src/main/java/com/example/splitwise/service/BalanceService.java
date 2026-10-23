@@ -3,10 +3,7 @@ package com.example.splitwise.service;
 import com.example.splitwise.dto.BalanceResponse;
 import com.example.splitwise.entity.*;
 import com.example.splitwise.exception.ResourceNotFoundException;
-import com.example.splitwise.repository.ExpenseGroupRepository;
-import com.example.splitwise.repository.ExpenseRepository;
-import com.example.splitwise.repository.ExpenseSplitRepository;
-import com.example.splitwise.repository.GroupMemberRepository;
+import com.example.splitwise.repository.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +20,14 @@ public class BalanceService {
     private final GroupMemberRepository memberRepository;
     private final ExpenseRepository expenseRepository;
     private final ExpenseSplitRepository splitRepository;
+    private final SettlementRepository settlementRepository;
 
-    public BalanceService(ExpenseGroupRepository groupRepository, GroupMemberRepository memberRepository, ExpenseRepository expenseRepository, ExpenseSplitRepository splitRepository) {
+    public BalanceService(ExpenseGroupRepository groupRepository, GroupMemberRepository memberRepository, ExpenseRepository expenseRepository, ExpenseSplitRepository splitRepository, SettlementRepository settlementRepository) {
         this.groupRepository = groupRepository;
         this.memberRepository = memberRepository;
         this.expenseRepository = expenseRepository;
         this.splitRepository = splitRepository;
+        this.settlementRepository = settlementRepository;
     }
 
     @Transactional(readOnly=true)
@@ -76,6 +75,30 @@ public class BalanceService {
                     return current.subtract(split.getShareamount());
                 });
             }
+        }
+        
+        List<Settlement> settlements=settlementRepository.findByGroup_Id(groupId);
+        for(Settlement settlement:settlements){
+            Long payerId=settlement.getPaidBy().getId();
+            Long recieverId=settlement.getPaidTo().getId();
+            BigDecimal amount=settlement.getAmount();
+
+            balances.compute(payerId,(id, current)->{
+                if(current==null){
+                    throw new IllegalStateException(
+                            "Settlement payer is not a group member: "+id
+                    );
+                }
+                return current.add(amount);
+            });
+            balances.compute(recieverId,(id, current)->{
+                if(current==null){
+                    throw new IllegalStateException(
+                            "Settlement reciever is not a group member: "+id
+                    );
+                }
+                return current.subtract(amount);
+            });
         }
         List<BalanceResponse> result=new ArrayList<>();
 
