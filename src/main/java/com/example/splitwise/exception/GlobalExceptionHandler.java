@@ -33,4 +33,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleDuplicateMembership(DuplicateGroupMembershipException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", exception.getMessage()));
     }
+
+    @ExceptionHandler(InvalidExpenseException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidExpense(InvalidExpenseException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", exception.getMessage()));
+    }
 }

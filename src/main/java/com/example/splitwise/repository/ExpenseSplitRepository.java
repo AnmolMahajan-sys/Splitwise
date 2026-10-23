@@ -8,4 +8,5 @@ import java.util.List;
 public interface ExpenseSplitRepository extends JpaRepository<ExpenseSplit, Long> {
 
         List<ExpenseSplit> findByExpense_Id(Long expenseId);
+        List<ExpenseSplit> findByExpense_IdIn(List<Long> expenseIds);
 }
