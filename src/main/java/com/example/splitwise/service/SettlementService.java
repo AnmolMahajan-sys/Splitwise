@@ -86,4 +86,5 @@ public class SettlementService {
         return settlementRepository.findByGroup_Id(groupId).stream().map(SettlementResponse::from).toList();
     }
 
+
 }

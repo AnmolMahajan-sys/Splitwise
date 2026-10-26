@@ -17,5 +17,6 @@ public class AddGroupMemberRequest {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+
     }
 }

@@ -76,7 +76,7 @@ public class BalanceService {
                 });
             }
         }
-        
+
         List<Settlement> settlements=settlementRepository.findByGroup_Id(groupId);
         for(Settlement settlement:settlements){
             Long payerId=settlement.getPaidBy().getId();
