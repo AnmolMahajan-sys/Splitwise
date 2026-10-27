@@ -39,9 +39,53 @@ public class ExpenseService {
     @Transactional
     public ExpenseResponse createExpense(
             Long groupId, CreateExpenseRequest request){
+
+        if (request == null) {
+            throw new InvalidExpenseException(
+                    "Expense request cannot be null"
+            );
+        }
+
+        if (request.getPaidByUserId() <= 0) {
+            throw new InvalidExpenseException(
+                    "Payer ID must be greater than zero"
+            );
+        }
+
         ExpenseGroup group = groupRepository.findById(groupId).orElseThrow(()->new ResourceNotFoundException(
                 "Group not found with id " + groupId
         ));
+
+
+
+        BigDecimal requestedAmount = request.getAmount();
+
+        if (requestedAmount == null ||
+                requestedAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidExpenseException(
+                    "Expense amount must be greater than zero"
+            );
+        }
+
+        if (requestedAmount.scale() > 2) {
+            throw new InvalidExpenseException(
+                    "Expense amount must have at most two decimal places"
+            );
+        }
+
+        String description = request.getDescription();
+
+        if (description == null || description.isBlank()) {
+            throw new InvalidExpenseException(
+                    "Expense description cannot be blank"
+            );
+        }
+
+        if (description.length() > 255) {
+            throw new InvalidExpenseException(
+                    "Expense description cannot exceed 255 characters"
+            );
+        }
 
         Long payerId=request.getPaidByUserId();
         User payer =userRepository.findById(payerId).orElseThrow(()->new ResourceNotFoundException(
@@ -52,15 +96,18 @@ public class ExpenseService {
             throw new InvalidExpenseException("User is not a member of this group");
 
         }
-        List<Long> participantIds=request.getParticipantUserIds();
-        Set<Long> uniqueParticipants=new HashSet<>(participantIds);
+        List<Long> participantIds = request.getParticipantUserIds();
 
-        if(uniqueParticipants.size()!=participantIds.size()){
-            throw new InvalidExpenseException("Duplicate participants are not allowed");
-        }
         if (participantIds == null || participantIds.isEmpty()) {
             throw new InvalidExpenseException("At least one participant is required");
         }
+
+        Set<Long> uniqueParticipants = new HashSet<>(participantIds);
+
+        if (uniqueParticipants.size() != participantIds.size()) {
+            throw new InvalidExpenseException("Duplicate participants are not allowed");
+        }
+
         List<User> partipants=new ArrayList<>();
 
         for(Long userId:participantIds){
@@ -68,12 +115,12 @@ public class ExpenseService {
                     "User not found with id " + userId
             ));
 
-            if(!memberRepository.existsByGroup_IdAndUser_Id(groupId, payerId)){
+            if(!memberRepository.existsByGroup_IdAndUser_Id(groupId, userId)){
                 throw new InvalidExpenseException("User "+userId+" is not a member of group "+groupId);
             }
             partipants.add(partipant);
         }
-        BigDecimal amount=request.getAmount().setScale(2, RoundingMode.UNNECESSARY);
+        BigDecimal amount=requestedAmount.setScale(2, RoundingMode.UNNECESSARY);
 
         Expense expense=new Expense(group,payer,request.getDescription().trim(),amount);
         Expense savedExpense=expenseRepository.save(expense);
