@@ -1,10 +1,9 @@
-package com.example.splitwise;
+package com.example.splitwise.service;
 
 import com.example.splitwise.dto.BalanceResponse;
 import com.example.splitwise.entity.*;
 import com.example.splitwise.exception.ResourceNotFoundException;
 import com.example.splitwise.repository.*;
-import com.example.splitwise.service.BalanceService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

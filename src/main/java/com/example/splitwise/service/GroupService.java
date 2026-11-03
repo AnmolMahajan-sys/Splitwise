@@ -5,6 +5,7 @@ import com.example.splitwise.dto.GroupResponse;
 import com.example.splitwise.entity.ExpenseGroup;
 import com.example.splitwise.entity.GroupMember;
 import com.example.splitwise.entity.User;
+import com.example.splitwise.exception.InvalidExpenseException;
 import com.example.splitwise.exception.ResourceNotFoundException;
 import com.example.splitwise.repository.ExpenseGroupRepository;
 import com.example.splitwise.repository.GroupMemberRepository;
@@ -28,6 +29,10 @@ public class GroupService {
 
     @Transactional
     public GroupResponse createGroup(CreateGroupRequest request){
+        if(request==null) throw new InvalidExpenseException("Group request cannot be null.");
+
+        if(request.getName()==null || request.getName().trim().isEmpty()) throw new InvalidExpenseException("Group name cannot be empty.");
+
         String groupName = request.getName().trim();
 
         User creator=userRepository.findById(request.getCreatedByUserId()).

@@ -1,11 +1,10 @@
-package com.example.splitwise;
+package com.example.splitwise.service;
 
 import com.example.splitwise.dto.CreateExpenseRequest;
 import com.example.splitwise.dto.ExpenseResponse;
 import com.example.splitwise.entity.*;
 import com.example.splitwise.exception.InvalidExpenseException;
 import com.example.splitwise.repository.*;
-import com.example.splitwise.service.ExpenseService;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;

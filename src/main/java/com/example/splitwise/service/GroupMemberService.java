@@ -6,6 +6,7 @@ import com.example.splitwise.entity.ExpenseGroup;
 import com.example.splitwise.entity.GroupMember;
 import com.example.splitwise.entity.User;
 import com.example.splitwise.exception.DuplicateGroupMembershipException;
+import com.example.splitwise.exception.InvalidExpenseException;
 import com.example.splitwise.exception.ResourceNotFoundException;
 import com.example.splitwise.repository.ExpenseGroupRepository;
 import com.example.splitwise.repository.GroupMemberRepository;
@@ -32,6 +33,11 @@ public class GroupMemberService {
     public GroupMemberResponse addMember(
             Long groupId,
             AddGroupMemberRequest request){
+
+        if (request == null) {
+            throw new InvalidExpenseException("Add member request cannot be null.");
+        }
+
         ExpenseGroup group = groupRepository.findById(groupId).orElseThrow(()-> new ResourceNotFoundException("Group not found with ID: "+groupId));
 
         Long userId = request.getUserId();
