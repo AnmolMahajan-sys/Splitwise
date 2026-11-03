@@ -72,7 +72,7 @@ public class BalanceService {
                                 "Expense participant is not a group member: "+id
                         );
                     }
-                    return current.subtract(split.getShareamount());
+                    return current.subtract(split.getShareAmount());
                 });
             }
         }

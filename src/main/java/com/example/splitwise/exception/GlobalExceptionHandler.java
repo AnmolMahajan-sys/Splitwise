@@ -1,5 +1,6 @@
 package com.example.splitwise.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -42,5 +43,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidSettlementException.class)
     public ResponseEntity<Map<String, String>> handleInvalidSettlement(InvalidSettlementException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", exception.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDatabaseConstraint(
+            DataIntegrityViolationException exception) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "Database constraint violation"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleUnexpectedException(
+            Exception exception) {
+
+        // Log the actual exception here.
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "An unexpected server error occurred"));
     }
 }

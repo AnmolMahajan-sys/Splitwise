@@ -200,7 +200,7 @@ class BalanceIntegrationTest {
                 .andExpect(jsonPath("$", hasSize(3)))
 
                 .andExpect(jsonPath("$[0].netBalance").value(60.00))
-               
+
                 .andExpect(jsonPath("$[1].netBalance").value(0.00))
 
                 .andExpect(jsonPath("$[2].netBalance").value(-60.00));

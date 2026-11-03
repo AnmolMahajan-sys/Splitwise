@@ -20,7 +20,7 @@ public class ExpenseSplitResponse {
         return new ExpenseSplitResponse(
                 split.getUser().getId(),
                 split.getUser().getName(),
-                split.getShareamount()
+                split.getShareAmount()
         );
     }
     public Long getUserId() {

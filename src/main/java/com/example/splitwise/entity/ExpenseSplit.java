@@ -31,19 +31,19 @@ public class ExpenseSplit {
             precision = 12,
             scale = 2
     )
-    private BigDecimal shareamount;
+    private BigDecimal shareAmount;
 
     protected  ExpenseSplit() {}
 
-    public ExpenseSplit(Expense expense, User user, BigDecimal shareamount) {
+    public ExpenseSplit(Expense expense, User user, BigDecimal shareAmount) {
         this.expense = expense;
         this.user = user;
-        this.shareamount = shareamount;
+        this.shareAmount = shareAmount;
     }
 
     public Long getId() {return id;}
     public Expense getExpense() {return expense;}
     public User getUser() {return user;}
-    public BigDecimal getShareamount() {return shareamount;}
+    public BigDecimal getShareAmount() {return shareAmount;}
 }
 

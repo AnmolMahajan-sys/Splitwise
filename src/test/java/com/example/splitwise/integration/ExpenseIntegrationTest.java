@@ -4,6 +4,7 @@ package com.example.splitwise.integration;
 import com.example.splitwise.entity.ExpenseGroup;
 import com.example.splitwise.entity.GroupMember;
 import com.example.splitwise.entity.User;
+
 import com.example.splitwise.repository.ExpenseGroupRepository;
 import com.example.splitwise.repository.ExpenseRepository;
 import com.example.splitwise.repository.ExpenseSplitRepository;
@@ -16,10 +17,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.UncategorizedSQLException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -48,6 +54,9 @@ class ExpenseIntegrationTest {
 
     @Autowired
     private ExpenseSplitRepository splitRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private User creator;
     private User secondUser;
@@ -95,7 +104,8 @@ class ExpenseIntegrationTest {
             Long payerId,
             String description,
             String amount,
-            String participantIds) {
+            String participantIds
+    ) {
 
         return """
                 {
@@ -111,6 +121,10 @@ class ExpenseIntegrationTest {
                 participantIds
         );
     }
+
+    // =====================================================
+    // EXISTING EXPENSE API INTEGRATION TESTS
+    // =====================================================
 
     @Test
     void shouldCreateExpenseAndSaveInDatabase() throws Exception {
@@ -335,5 +349,196 @@ class ExpenseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
+
+    // =====================================================
+    // DATABASE INTEGRITY TEST HELPERS
+    // =====================================================
+
+    private Long insertExpense(String amount) {
+
+        return jdbcTemplate.queryForObject(
+                """
+                INSERT INTO expenses
+                    (group_id, paid_by, description, amount)
+                VALUES (?, ?, ?, ?)
+                RETURNING id
+                """,
+                Long.class,
+                group.getId(),
+                creator.getId(),
+                "Database integrity test",
+                new BigDecimal(amount)
+        );
+    }
+
+    private void insertSplit(
+            Long expenseId,
+            Long userId,
+            String amount
+    ) {
+
+        jdbcTemplate.update(
+                """
+                INSERT INTO expense_splits
+                    (expense_id, user_id, share_amount)
+                VALUES (?, ?, ?)
+                """,
+                expenseId,
+                userId,
+                new BigDecimal(amount)
+        );
+    }
+
+    // =====================================================
+    // V5: EXPENSE SPLIT TOTAL TESTS
+    // =====================================================
+
+    @Test
+    void shouldAcceptExpenseWhenSplitTotalMatchesExpenseAmount() {
+
+        Long expenseId = insertExpense("100.00");
+
+        insertSplit(expenseId, creator.getId(), "60.00");
+        insertSplit(expenseId, secondUser.getId(), "40.00");
+
+        jdbcTemplate.execute("SET CONSTRAINTS ALL IMMEDIATE");
+
+        BigDecimal total = jdbcTemplate.queryForObject(
+                """
+                SELECT SUM(share_amount)
+                FROM expense_splits
+                WHERE expense_id = ?
+                """,
+                BigDecimal.class,
+                expenseId
+        );
+
+        assertEquals(new BigDecimal("100.00"), total);
+    }
+
+    @Test
+    void shouldRejectExpenseWhenSplitTotalDoesNotMatchExpenseAmount() {
+
+        Long expenseId = insertExpense("100.00");
+
+        insertSplit(expenseId, creator.getId(), "60.00");
+        insertSplit(expenseId, secondUser.getId(), "30.00");
+
+        assertThrows(
+                UncategorizedSQLException.class,
+                () -> jdbcTemplate.execute(
+                        "SET CONSTRAINTS ALL IMMEDIATE"
+                )
+        );
+    }
+
+    @Test
+    void shouldRejectSplitUpdateWhenTotalBecomesIncorrect() {
+
+        Long expenseId = insertExpense("100.00");
+
+        insertSplit(expenseId, creator.getId(), "60.00");
+        insertSplit(expenseId, secondUser.getId(), "40.00");
+
+        jdbcTemplate.execute("SET CONSTRAINTS ALL IMMEDIATE");
+        jdbcTemplate.execute("SET CONSTRAINTS ALL DEFERRED");
+
+        assertThrows(
+                UncategorizedSQLException.class,
+                () -> {
+                    jdbcTemplate.update(
+                            """
+                            UPDATE expense_splits
+                            SET share_amount = 30.00
+                            WHERE expense_id = ? AND user_id = ?
+                            """,
+                            expenseId,
+                            secondUser.getId()
+                    );
+
+                    jdbcTemplate.execute(
+                            "SET CONSTRAINTS ALL IMMEDIATE"
+                    );
+                }
+        );
+    }
+
+    @Test
+    void shouldRejectSplitDeletionWhenTotalBecomesIncorrect() {
+
+        Long expenseId = insertExpense("100.00");
+
+        insertSplit(expenseId, creator.getId(), "60.00");
+        insertSplit(expenseId, secondUser.getId(), "40.00");
+
+        jdbcTemplate.execute("SET CONSTRAINTS ALL IMMEDIATE");
+        jdbcTemplate.execute("SET CONSTRAINTS ALL DEFERRED");
+
+        assertThrows(
+                UncategorizedSQLException.class,
+                () -> {
+                    jdbcTemplate.update(
+                            """
+                            DELETE FROM expense_splits
+                            WHERE expense_id = ? AND user_id = ?
+                            """,
+                            expenseId,
+                            secondUser.getId()
+                    );
+
+                    jdbcTemplate.execute(
+                            "SET CONSTRAINTS ALL IMMEDIATE"
+                    );
+                }
+        );
+    }
+
+    // =====================================================
+    // V4: EXPENSE SPLIT MEMBERSHIP TESTS
+    // =====================================================
+
+    @Test
+    void shouldRejectExpenseSplitParticipantWhoIsNotGroupMember() {
+
+        Long expenseId = insertExpense("100.00");
+
+        assertThrows(
+                UncategorizedSQLException.class,
+                () -> jdbcTemplate.update(
+                        """
+                        INSERT INTO expense_splits
+                            (expense_id, user_id, share_amount)
+                        VALUES (?, ?, ?)
+                        """,
+                        expenseId,
+                        outsider.getId(),
+                        new BigDecimal("100.00")
+                )
+        );
+    }
+
+    @Test
+    void shouldPreventRemovingMemberWithExistingExpenseSplit() {
+
+        Long expenseId = insertExpense("100.00");
+
+        insertSplit(expenseId, creator.getId(), "60.00");
+        insertSplit(expenseId, secondUser.getId(), "40.00");
+
+        jdbcTemplate.execute("SET CONSTRAINTS ALL IMMEDIATE");
+
+        assertThrows(
+                UncategorizedSQLException.class,
+                () -> jdbcTemplate.update(
+                        """
+                        DELETE FROM group_members
+                        WHERE group_id = ? AND user_id = ?
+                        """,
+                        group.getId(),
+                        secondUser.getId()
+                )
+        );
+    }
 }
+
 

@@ -75,10 +75,10 @@ public class BalanceServiceTest {
         ExpenseSplit rahulSplit = org.mockito.Mockito.mock(ExpenseSplit.class);
 
         when(anmolSplit.getUser()).thenReturn(anmol);
-        when(anmolSplit.getShareamount()).thenReturn(new BigDecimal("450.00"));
+        when(anmolSplit.getShareAmount()).thenReturn(new BigDecimal("450.00"));
 
         when(rahulSplit.getUser()).thenReturn(rahul);
-        when(rahulSplit.getShareamount()).thenReturn(new BigDecimal("450.00"));
+        when(rahulSplit.getShareAmount()).thenReturn(new BigDecimal("450.00"));
 
         when(splitRepository.findByExpense_IdIn(List.of(100L))).thenReturn(List.of(anmolSplit, rahulSplit));
 
@@ -179,13 +179,13 @@ public class BalanceServiceTest {
         ExpenseSplit priyaSplit = org.mockito.Mockito.mock(ExpenseSplit.class);
 
         when(anmolSplit.getUser()).thenReturn(anmol);
-        when(anmolSplit.getShareamount()).thenReturn(new BigDecimal("500.00"));
+        when(anmolSplit.getShareAmount()).thenReturn(new BigDecimal("500.00"));
 
         when(rahulSplit.getUser()).thenReturn(rahul);
-        when(rahulSplit.getShareamount()).thenReturn(new BigDecimal("300.00"));
+        when(rahulSplit.getShareAmount()).thenReturn(new BigDecimal("300.00"));
 
         when(priyaSplit.getUser()).thenReturn(priya);
-        when(priyaSplit.getShareamount()).thenReturn(new BigDecimal("200.00"));
+        when(priyaSplit.getShareAmount()).thenReturn(new BigDecimal("200.00"));
 
         when(splitRepository.findByExpense_IdIn(List.of(100L))).thenReturn(List.of(
                 anmolSplit,rahulSplit,priyaSplit
@@ -258,28 +258,28 @@ public class BalanceServiceTest {
 
         ExpenseSplit split1Anmol = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(split1Anmol.getUser()).thenReturn(anmol);
-        when(split1Anmol.getShareamount()).thenReturn(new BigDecimal("400.00"));
+        when(split1Anmol.getShareAmount()).thenReturn(new BigDecimal("400.00"));
 
         ExpenseSplit split1Rahul = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(split1Rahul.getUser()).thenReturn(rahul);
-        when(split1Rahul.getShareamount()).thenReturn(new BigDecimal("300.00"));
+        when(split1Rahul.getShareAmount()).thenReturn(new BigDecimal("300.00"));
 
         ExpenseSplit split1Priya = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(split1Priya.getUser()).thenReturn(priya);
-        when(split1Priya.getShareamount()).thenReturn(new BigDecimal("300.00"));
+        when(split1Priya.getShareAmount()).thenReturn(new BigDecimal("300.00"));
 
 
         ExpenseSplit split2Anmol = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(split2Anmol.getUser()).thenReturn(anmol);
-        when(split2Anmol.getShareamount()).thenReturn(new BigDecimal("0.00"));
+        when(split2Anmol.getShareAmount()).thenReturn(new BigDecimal("0.00"));
 
         ExpenseSplit split2Rahul = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(split2Rahul.getUser()).thenReturn(rahul);
-        when(split2Rahul.getShareamount()).thenReturn(new BigDecimal("0.00"));
+        when(split2Rahul.getShareAmount()).thenReturn(new BigDecimal("0.00"));
 
         ExpenseSplit split2Priya = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(split2Priya.getUser()).thenReturn(priya);
-        when(split2Priya.getShareamount()).thenReturn(new BigDecimal("600.00"));
+        when(split2Priya.getShareAmount()).thenReturn(new BigDecimal("600.00"));
 
         when(splitRepository.findByExpense_IdIn(List.of(100L, 200L)))
                 .thenReturn(List.of(
@@ -353,7 +353,7 @@ public class BalanceServiceTest {
 
         ExpenseSplit validSplit = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(validSplit.getUser()).thenReturn(anmol);
-        when(validSplit.getShareamount()).thenReturn(new BigDecimal("50.00"));
+        when(validSplit.getShareAmount()).thenReturn(new BigDecimal("50.00"));
 
         ExpenseSplit invalidSplit = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(invalidSplit.getUser()).thenReturn(outsider);
@@ -548,11 +548,11 @@ public class BalanceServiceTest {
 
         ExpenseSplit anmolSplit = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(anmolSplit.getUser()).thenReturn(anmol);
-        when(anmolSplit.getShareamount()).thenReturn(new BigDecimal("200.00"));
+        when(anmolSplit.getShareAmount()).thenReturn(new BigDecimal("200.00"));
 
         ExpenseSplit rahulSplit = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(rahulSplit.getUser()).thenReturn(rahul);
-        when(rahulSplit.getShareamount()).thenReturn(new BigDecimal("0.00"));
+        when(rahulSplit.getShareAmount()).thenReturn(new BigDecimal("0.00"));
 
         when(splitRepository.findByExpense_IdIn(List.of(100L)))
                 .thenReturn(List.of(anmolSplit, rahulSplit));
@@ -626,11 +626,11 @@ public class BalanceServiceTest {
 
         ExpenseSplit anmolSplit = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(anmolSplit.getUser()).thenReturn(anmol);
-        when(anmolSplit.getShareamount()).thenReturn(new BigDecimal("200.00"));
+        when(anmolSplit.getShareAmount()).thenReturn(new BigDecimal("200.00"));
 
         ExpenseSplit rahulSplit = org.mockito.Mockito.mock(ExpenseSplit.class);
         when(rahulSplit.getUser()).thenReturn(rahul);
-        when(rahulSplit.getShareamount()).thenReturn(new BigDecimal("0.00"));
+        when(rahulSplit.getShareAmount()).thenReturn(new BigDecimal("0.00"));
 
         when(splitRepository.findByExpense_IdIn(List.of(100L)))
                 .thenReturn(List.of(anmolSplit, rahulSplit));

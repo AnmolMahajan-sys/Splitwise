@@ -439,23 +439,23 @@ class ExpenseServiceTest {
         ExpenseSplit split1 = mock(ExpenseSplit.class);
         when(split1.getExpense()).thenReturn(expense1);
         when(split1.getUser()).thenReturn(payer);
-        when(split1.getShareamount()).thenReturn(new BigDecimal("50.00"));
+        when(split1.getShareAmount()).thenReturn(new BigDecimal("50.00"));
 
         ExpenseSplit split2 = mock(ExpenseSplit.class);
         when(split2.getExpense()).thenReturn(expense1);
         when(split2.getUser()).thenReturn(rahul);
-        when(split2.getShareamount()).thenReturn(new BigDecimal("50.00"));
+        when(split2.getShareAmount()).thenReturn(new BigDecimal("50.00"));
 
         // Splits for expense 102
         ExpenseSplit split3 = mock(ExpenseSplit.class);
         when(split3.getExpense()).thenReturn(expense2);
         when(split3.getUser()).thenReturn(payer);
-        when(split3.getShareamount()).thenReturn(new BigDecimal("30.00"));
+        when(split3.getShareAmount()).thenReturn(new BigDecimal("30.00"));
 
         ExpenseSplit split4 = mock(ExpenseSplit.class);
         when(split4.getExpense()).thenReturn(expense2);
         when(split4.getUser()).thenReturn(rahul);
-        when(split4.getShareamount()).thenReturn(new BigDecimal("30.00"));
+        when(split4.getShareAmount()).thenReturn(new BigDecimal("30.00"));
 
         when(splitRepository.findByExpense_IdIn(List.of(101L, 102L)))
                 .thenReturn(List.of(split1, split2, split3, split4));

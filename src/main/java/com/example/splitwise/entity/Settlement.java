@@ -11,7 +11,7 @@ public class Settlement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "group_id", nullable = false)
@@ -52,7 +52,7 @@ public class Settlement {
         }
     }
 
-    public long getId() {return id;}
+    public Long getId() {return id;}
     public ExpenseGroup getGroup() {return group;}
     public User getPaidBy() {return paidBy;}
     public User getPaidTo() {return paidTo;}
